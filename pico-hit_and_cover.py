@@ -1,3 +1,4 @@
+import random
 from pimoroni import Button
 from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY, PEN_RGB332
 import jpegdec
@@ -20,9 +21,16 @@ class Hand:
             self.small_y1 =12 
             self.small_y2 =52 
             self.small_y3 =92 
-            self.img_s_1 = 'img/gu_l_s.jpg'
-            self.img_s_2 = 'img/ti_l_s.jpg'
-            self.img_s_3 = 'img/pa_l_s.jpg'
+            self.img_s = ['img/gu_l_s.jpg', 'img/ti_l_s.jpg', 'img/pa_l_s.jpg']
+#            self.img_s[0] = 'img/gu_l_s.jpg'
+#            self.img_s[1] = 'img/ti_l_s.jpg'
+#            self.img_s[2] = 'img/pa_l_s.jpg'
+            self.large_x = 40
+            self.large_y =27 
+            self.img_l = ['img/gu_l_l.jpg', 'img/ti_l_l.jpg', 'img/pa_l_l.jpg']
+#            self.img_l[0] = 'img/gu_l_l.jpg'
+#            self.img_l[1] = 'img/ti_l_l.jpg'
+#            self.img_l[2] = 'img/pa_l_l.jpg'
             self.line_a = [0, 2, 4, 2]
             self.line_b = [2, 4, 2, 0]
             self.line_c = [4, 2, 0, 2]
@@ -40,9 +48,16 @@ class Hand:
             self.small_y1 =92 
             self.small_y2 =52 
             self.small_y3 =12 
-            self.img_s_1 = 'img/gu_r_s.jpg'
-            self.img_s_2 = 'img/ti_r_s.jpg'
-            self.img_s_3 = 'img/pa_r_s.jpg'
+            self.img_s = ['img/gu_r_s.jpg', 'img/ti_r_s.jpg', 'img/pa_r_s.jpg']
+#            self.img_s[0] = 'img/gu_r_s.jpg'
+#            self.img_s[1] = 'img/ti_r_s.jpg'
+#            self.img_s[2] = 'img/pa_r_s.jpg'
+            self.large_x = 120
+            self.large_y =27 
+            self.img_l = ['img/gu_r_l.jpg', 'img/ti_r_l.jpg', 'img/pa_r_l.jpg']
+#            self.img_l[0] = 'img/gu_r_l.jpg'
+#            self.img_l[1] = 'img/ti_r_l.jpg'
+#            self.img_l[2] = 'img/pa_r_l.jpg'
             self.line_a = [-0, -2, -4, -2]
             self.line_b = [-2, -4, -2, -0]
             self.line_c = [-4, -2, -0, -2]
@@ -86,6 +101,12 @@ class Hand:
         else:
             return False
 
+    def is_show(self):
+        if self.status == 'show':
+            return True
+        else:
+            return False
+
     def ready(self):
         if self.status == 'ready':
             self.status = 'wait'
@@ -101,9 +122,9 @@ class Hand:
 
     def update(self):
         if self.status == 'ready' or self.status == 'countdown':
-            display_image(self.img_s_1, self.small_x+self.line_a[self.ready_count]+self.count_a[self.countdown_count], self.small_y1)
-            display_image(self.img_s_2, self.small_x+self.line_b[self.ready_count]+self.count_b[self.countdown_count], self.small_y2)
-            display_image(self.img_s_3, self.small_x+self.line_c[self.ready_count]+self.count_c[self.countdown_count], self.small_y3)
+            display_image(self.img_s[0], self.small_x+self.line_a[self.ready_count]+self.count_a[self.countdown_count], self.small_y1)
+            display_image(self.img_s[1], self.small_x+self.line_b[self.ready_count]+self.count_b[self.countdown_count], self.small_y2)
+            display_image(self.img_s[2], self.small_x+self.line_c[self.ready_count]+self.count_c[self.countdown_count], self.small_y3)
 
             if self.ready_count >= 3:
                 self.ready_count = 0
@@ -114,9 +135,16 @@ class Hand:
                 self.countdown_count += 1
                 if self.countdown_count >= 45:
                     self.countdown_count = 0
-                    self.status = 'show'
-                    print(f'side:[{self.side}, {self.status}]')
+                    self.get_result()
+        
+        elif self.is_show():
+            display_image(self.img_l[self.result], self.large_x, self.large_y)
 
+    def get_result(self):
+        self.hand_dic = ['gu', 'ti', 'pa']
+        self.result = random.randint(0,2)
+        self.status = 'show'
+        print(f'side:[{self.side}, {self.status}, {self.result}]')
 
 WHITE = display.create_pen(255, 255, 255)
 def clear():
