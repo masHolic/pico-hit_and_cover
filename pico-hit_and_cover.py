@@ -26,7 +26,7 @@ class Hand:
 #            self.img_s[1] = 'img/ti_l_s.jpg'
 #            self.img_s[2] = 'img/pa_l_s.jpg'
             self.large_x = 40
-            self.large_y =27 
+            self.large_y =32 
             self.img_l = ['img/gu_l_l.jpg', 'img/ti_l_l.jpg', 'img/pa_l_l.jpg']
 #            self.img_l[0] = 'img/gu_l_l.jpg'
 #            self.img_l[1] = 'img/ti_l_l.jpg'
@@ -43,6 +43,9 @@ class Hand:
             self.count_c = [  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
                               0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
                               0,  5, 10, 15, 20, 25, 30, 35, 30, 25, 20, 15, 10,  5,  0]
+            self.even_shift = [ 0, 2, 4, 6, 8, 10, 8, 6, 4, 2, 0, 2, 4, 6, 8, 10, 8, 6, 4, 2, 0]
+            self.win_shift = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+            self.lose_shift = [ 0, 0, 0, 0, 0,-1,-2,-3,-4,-5,-6,-7,-8,-9,-10,-10,-10,-10,-10,-10,-10]
         elif self.side == 'right':
             self.small_x = 170
             self.small_y1 =92 
@@ -52,8 +55,8 @@ class Hand:
 #            self.img_s[0] = 'img/gu_r_s.jpg'
 #            self.img_s[1] = 'img/ti_r_s.jpg'
 #            self.img_s[2] = 'img/pa_r_s.jpg'
-            self.large_x = 120
-            self.large_y =27 
+            self.large_x = 130
+            self.large_y =32 
             self.img_l = ['img/gu_r_l.jpg', 'img/ti_r_l.jpg', 'img/pa_r_l.jpg']
 #            self.img_l[0] = 'img/gu_r_l.jpg'
 #            self.img_l[1] = 'img/ti_r_l.jpg'
@@ -70,6 +73,9 @@ class Hand:
             self.count_c = [ -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0,
                              -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0,
                              -0, -5,-10,-15,-20,-25,-30,-35,-30,-25,-20,-15,-10, -5, -0]
+            self.even_shift = [-0,-2,-4,-6,-8,-10,-8,-6,-4,-2,-0,-2,-4,-6,-8,-10,-8,-6,-4,-2,-0]
+            self.win_shift = [-0,-1,-2,-3,-4,-5,-6,-7,-8,-9,-10,-11,-12,-13,-14,-15,-16,-17,-18,-19,-20]
+            self.lose_shift = [ 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 10, 10, 10]
         self.status = 'wait'
         self.ready_count = 0
         self.line_a = [0, 2, 4, 2]
@@ -107,6 +113,24 @@ class Hand:
         else:
             return False
 
+    def is_even(self):
+        if self.status == 'even':
+            return True
+        else:
+            return False
+
+    def is_win(self):
+        if self.status == 'win':
+            return True
+        else:
+            return False
+
+    def is_lose(self):
+        if self.status == 'lose':
+            return True
+        else:
+            return False
+
     def ready(self):
         if self.status == 'ready':
             self.status = 'wait'
@@ -119,6 +143,21 @@ class Hand:
             self.status = 'countdown'
             self.countdown_count = 0
         print(f'side:[{self.side}, {self.status}]')
+
+    def even(self):
+        self.status = 'even'
+        print(f'side:[{self.side}, {self.status}]')
+        self.even_count = 0
+
+    def win(self):
+        self.status = 'win'
+        print(f'side:[{self.side}, {self.status}]')
+        self.win_count = 0
+
+    def lose(self):
+        self.status = 'lose'
+        print(f'side:[{self.side}, {self.status}]')
+        self.lose_count = 0
 
     def update(self):
         if self.status == 'ready' or self.status == 'countdown':
@@ -138,13 +177,35 @@ class Hand:
                     self.get_result()
         
         elif self.is_show():
-            display_image(self.img_l[self.result], self.large_x, self.large_y)
+            display_image(self.img_l[self.sign], self.large_x, self.large_y)
+
+        elif self.is_even():
+            display_image(self.img_l[self.sign], self.large_x+self.even_shift[self.even_count], self.large_y)
+            self.even_count += 1
+            if self.even_count > 20:
+                self.even_count = 0
+                self.get_result()
+
+        elif self.is_win():
+            display_image(self.img_l[self.sign], self.large_x+self.win_shift[self.win_count], self.large_y)
+            self.win_count += 1
+            if self.win_count > 20:
+                self.win_count = 0
+                self.get_result()
+
+        elif self.is_lose():
+            display_image(self.img_l[self.sign], self.large_x, self.large_y)
+            display_image(self.img_l[self.sign], self.large_x+self.lose_shift[self.lose_count], self.large_y)
+            self.lose_count += 1
+            if self.lose_count > 20:
+                self.lose_count = 0
+                self.get_result()
 
     def get_result(self):
         self.hand_dic = ['gu', 'ti', 'pa']
-        self.result = random.randint(0,2)
+        self.sign = random.randint(0,2)
         self.status = 'show'
-        print(f'side:[{self.side}, {self.status}, {self.result}]')
+        print(f'side:[{self.side}, {self.status}, {self.sign}]')
 
 WHITE = display.create_pen(255, 255, 255)
 def clear():
@@ -159,7 +220,6 @@ j = jpegdec.JPEG(display)
 def display_image(filename: str, x: int, y:int):
     j.open_file(filename)
     j.decode(x, y, jpegdec.JPEG_SCALE_FULL)
-#    display.update()
 
 def show_icon():
     display_image("img/sheld_l_s.jpg", 0, 10)
@@ -175,31 +235,38 @@ right_hand = Hand('right')
 while True:
     display.rectangle(30,0,180,135)
     if button_a.read():
-#        j.open_file("img/sheld_l_l.jpg")
-#        j.decode(40, 27, jpegdec.JPEG_SCALE_FULL)
-#        left_hand.ready()
         left_hand.push_button2()
     elif button_b.read():
-#        j.open_file("img/sword_l_l.jpg")
-#        j.decode(40, 27, jpegdec.JPEG_SCALE_FULL)
-#        left_hand.ready()
         left_hand.push_button1()
 
     if button_x.read():
-#        j.open_file("img/sword_r_l.jpg")
-#        j.decode(120, 27, jpegdec.JPEG_SCALE_FULL)
-#        right_hand.ready()
         right_hand.push_button1()
     elif button_y.read():
-#        j.open_file("img/sheld_r_l.jpg")
-#        j.decode(120, 27, jpegdec.JPEG_SCALE_FULL)
-#        right_hand.ready()
         right_hand.push_button2()
 
     if left_hand.is_ready() and right_hand.is_ready():
         left_hand.countdown()
         right_hand.countdown()
 
+    if left_hand.is_show():
+        print(f'{left_hand.sign=}')
+
+    if right_hand.is_show():
+        print(f'{right_hand.sign=}')
+
+    if left_hand.is_show() and right_hand.is_show():
+        if left_hand.sign == right_hand.sign:
+            left_hand.even()
+            right_hand.even()
+        elif left_hand.sign == 0 and right_hand.sign == 2:
+            left_hand.lose()
+            right_hand.win()
+        elif left_hand.sign < right_hand.sign:
+            left_hand.win()
+            right_hand.lose()
+        else:
+            left_hand.lose()
+            right_hand.win()
 
     left_hand.update()
     right_hand.update()
