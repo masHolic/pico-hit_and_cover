@@ -194,7 +194,6 @@ class Hand:
                 self.get_result()
 
         elif self.is_lose():
-            display_image(self.img_l[self.sign], self.large_x, self.large_y)
             display_image(self.img_l[self.sign], self.large_x+self.lose_shift[self.lose_count], self.large_y)
             self.lose_count += 1
             if self.lose_count > 20:
