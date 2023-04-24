@@ -260,6 +260,9 @@ while True:
         elif left_hand.sign == 0 and right_hand.sign == 2:
             left_hand.lose()
             right_hand.win()
+        elif left_hand.sign == 2 and right_hand.sign == 0:
+            left_hand.win()
+            right_hand.lose()
         elif left_hand.sign < right_hand.sign:
             left_hand.win()
             right_hand.lose()
