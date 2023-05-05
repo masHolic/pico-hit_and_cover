@@ -162,15 +162,20 @@ class Hand:
         self.lose_count = 0
 
     def update(self):
-        if self.status == 'ready' or self.status == 'countdown':
-            display_image(self.img_s[0], self.small_x+self.line_a[self.ready_count]+self.count_a[self.countdown_count], self.small_y1)
-            display_image(self.img_s[1], self.small_x+self.line_b[self.ready_count]+self.count_b[self.countdown_count], self.small_y2)
-            display_image(self.img_s[2], self.small_x+self.line_c[self.ready_count]+self.count_c[self.countdown_count], self.small_y3)
+        if self.status == 'ready':
+            display_image(self.img_s[0], self.small_x+self.line_a[self.ready_count], self.small_y1)
+            display_image(self.img_s[1], self.small_x+self.line_b[self.ready_count], self.small_y2)
+            display_image(self.img_s[2], self.small_x+self.line_c[self.ready_count], self.small_y3)
 
             if self.ready_count >= 3:
                 self.ready_count = 0
             else:
                 self.ready_count += 1
+
+        elif self.status == 'countdown':
+            display_image(self.img_s[0], self.small_x+self.count_a[self.countdown_count], self.small_y1)
+            display_image(self.img_s[1], self.small_x+self.count_b[self.countdown_count], self.small_y2)
+            display_image(self.img_s[2], self.small_x+self.count_c[self.countdown_count], self.small_y3)
 
             if self.is_countdown():
                 self.countdown_count += 1
