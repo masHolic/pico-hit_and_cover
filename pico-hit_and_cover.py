@@ -1,5 +1,6 @@
 import random
-from pimoroni import Button
+# from pimoroni import Button
+from machine import Pin
 # from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY, PEN_RGB332
 from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY
 import jpegdec
@@ -9,93 +10,79 @@ display.set_backlight(1.0)
 
 WIDTH, HEIGHT = display.get_bounds()
 
-button_a = Button(12)
-button_b = Button(13)
-button_x = Button(14)
-button_y = Button(15)
-
-
 class Hand:
     def __init__(self, side: str):
         self.side = side
         if self.side == 'left':
+            self.direction = 1
             self.small_x = 30
             self.small_y1 = 12
             self.small_y2 = 52
             self.small_y3 = 92
             self.img_s = ['img/gu_l_s.jpg', 'img/ti_l_s.jpg', 'img/pa_l_s.jpg']
-#            self.img_s[0] = 'img/gu_l_s.jpg'
-#            self.img_s[1] = 'img/ti_l_s.jpg'
-#            self.img_s[2] = 'img/pa_l_s.jpg'
             self.large_x = 40
             self.large_y = 32
             self.img_l = ['img/gu_l_l.jpg', 'img/ti_l_l.jpg', 'img/pa_l_l.jpg']
-#            self.img_l[0] = 'img/gu_l_l.jpg'
-#            self.img_l[1] = 'img/ti_l_l.jpg'
-#            self.img_l[2] = 'img/pa_l_l.jpg'
             self.line_a = [0, 2, 4, 2]
             self.line_b = [2, 4, 2, 0]
             self.line_c = [4, 2, 0, 2]
-            self.count_a = [0,  5, 10, 15, 20, 25, 30, 35, 30, 25, 20, 15, 10, 5,  0,
-                            0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 0,  0,
-                            0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 0,  0]
-            self.count_b = [0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 0,  0,
-                            0,  5, 10, 15, 20, 25, 30, 35, 30, 25, 20, 15, 10, 5,  0,
-                            0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 0,  0]
-            self.count_c = [0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 0,  0,
-                            0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 0,  0,
-                            0,  5, 10, 15, 20, 25, 30, 35, 30, 25, 20, 15, 10, 5,  0]
             self.even_shift = [0, 2, 4, 6, 8, 10, 8, 6, 4, 2, 0, 2, 4, 6, 8, 10, 8, 6, 4, 2, 0]
             self.win_shift = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40]
             self.lose_shift = [0, 0, 0, 0, 0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -10, -10, -10, -10, -10, -10]
+            self.sword_l = 'img/sword_l_l.jpg'
+            self.sheld_l = 'img/sheld_l_l.jpg'
+            self.wepon_move = 4
         elif self.side == 'right':
+            self.direction = -1
             self.small_x = 170
             self.small_y1 = 92
             self.small_y2 = 52
             self.small_y3 = 12
             self.img_s = ['img/gu_r_s.jpg', 'img/ti_r_s.jpg', 'img/pa_r_s.jpg']
-#            self.img_s[0] = 'img/gu_r_s.jpg'
-#            self.img_s[1] = 'img/ti_r_s.jpg'
-#            self.img_s[2] = 'img/pa_r_s.jpg'
             self.large_x = 130
             self.large_y = 32
             self.img_l = ['img/gu_r_l.jpg', 'img/ti_r_l.jpg', 'img/pa_r_l.jpg']
-#            self.img_l[0] = 'img/gu_r_l.jpg'
-#            self.img_l[1] = 'img/ti_r_l.jpg'
-#            self.img_l[2] = 'img/pa_r_l.jpg'
             self.line_a = [-0, -2, -4, -2]
             self.line_b = [-2, -4, -2, -0]
             self.line_c = [-4, -2, -0, -2]
-            self.count_a = [-0, -5, -10, -15, -20, -25, -30, -35, -30, -25, -20, -15, -10, -5, -0,
-                            -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0,
-                            -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0]
-            self.count_b = [-0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0,
-                            -0, -5, -10, -15, -20, -25, -30, -35, -30, -25, -20, -15, -10, -5, -0,
-                            -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0,  0]
-            self.count_c = [-0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0,
-                            -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0, -0,
-                            -0, -5, -10, -15, -20, -25, -30, -35, -30, -25, -20, -15, -10, -5, -0]
             self.even_shift = [-0, -2, -4, -6, -8, -10, -8, -6, -4, -2, -0, -2, -4, -6, -8, -10, -8, -6, -4, -2, -0]
             self.win_shift = [-0, -2, -4, -6, -8, -10, -12, -14, -16, -18, -20, -22, -24, -26, -28, -30, -32, -34, -36, -38, -40]
             self.lose_shift = [0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 10, 10, 10]
+            self.sword_l = 'img/sword_r_l.jpg'
+            self.sheld_l = 'img/sheld_r_l.jpg'
+            self.wepon_move = -4
         self.status = 'wait'
-        self.ready_count = 0
         self.line_a = [0, 2, 4, 2]
         self.line_b = [2, 4, 2, 0]
         self.line_c = [4, 2, 0, 2]
         self.ready_count = 0
         self.countdown_count = 0
+        self.count = 0
         print(f'side:[{self.side}, {self.status}]')
 
     def push_button1(self):
-        if self.status == 'wait':
-            self.status = 'ready'
+        if self.is_wait():
+            self.ready()
+        elif self.is_win():
+            self.status = 'win-sword'
+        elif self.is_lose():
+            self.status = 'lose-sword'
         print(f'side:[{self.side}, {self.status}]')
 
     def push_button2(self):
-        if self.status == 'wait':
-            self.status = 'ready'
+        if self.is_wait():
+            self.ready()
+        elif self.is_win():
+            self.status = 'win-sheld'
+        elif self.is_lose():
+            self.status = 'lose-sheld'
         print(f'side:[{self.side}, {self.status}]')
+
+    def is_wait(self):
+        if self.status == 'wait':
+            return True
+        else:
+            return False
 
     def is_ready(self):
         if self.status == 'ready':
@@ -134,16 +121,16 @@ class Hand:
             return False
 
     def ready(self):
-        if self.status == 'ready':
-            self.status = 'wait'
-        else:
+        if self.is_wait():
+            self.count = 0
             self.status = 'ready'
-        print(f'side:[{self.side}, {self.status}]')
+            print(f'side:[{self.side}, {self.status}]')
 
     def countdown(self):
         if self.status == 'ready':
             self.status = 'countdown'
             self.countdown_count = 0
+            self.count = 0
         print(f'side:[{self.side}, {self.status}]')
 
     def even(self):
@@ -162,33 +149,52 @@ class Hand:
         self.lose_count = 0
 
     def update(self):
-        if self.status == 'ready':
-            display_image(self.img_s[0], self.small_x+self.line_a[self.ready_count], self.small_y1)
-            display_image(self.img_s[1], self.small_x+self.line_b[self.ready_count], self.small_y2)
-            display_image(self.img_s[2], self.small_x+self.line_c[self.ready_count], self.small_y3)
+        # print(f'side:[{self.side}, {self.status}]')
+        if self.is_ready():
+            # self.ready_move = self.count * 2
+            # if self.ready_move == 6: self.ready_move -= 4
+            display_image(self.img_s[0], self.small_x+self.line_a[self.count], self.small_y1)
+            display_image(self.img_s[1], self.small_x+self.line_b[self.count], self.small_y2)
+            display_image(self.img_s[2], self.small_x+self.line_c[self.count], self.small_y3)
+            # display_image(self.img_s[0], self.small_x+self.line_a[self.count], self.small_y1)
+            # display_image(self.img_s[1], self.small_x+self.line_b[self.count], self.small_y2)
+            # display_image(self.img_s[2], self.small_x+self.line_c[self.count], self.small_y3)
 
-            if self.ready_count >= 3:
-                self.ready_count = 0
+            if self.count >= 3:
+                self.count = 0
             else:
-                self.ready_count += 1
+                self.count += 1
 
-        elif self.status == 'countdown':
-            display_image(self.img_s[0], self.small_x+self.count_a[self.countdown_count], self.small_y1)
-            display_image(self.img_s[1], self.small_x+self.count_b[self.countdown_count], self.small_y2)
-            display_image(self.img_s[2], self.small_x+self.count_c[self.countdown_count], self.small_y3)
+        elif self.is_countdown():
+            self.cdown_move_a = self.count * 5
+            if self.cdown_move_a > 35: self.cdown_move_a = 70 - self.cdown_move_a
+            if self.cdown_move_a < 0: self.cdown_move_a = 0
+            self.cdown_move_a = self.cdown_move_a * self.direction
+            self.cdown_move_b = (self.count - 7 ) * 5
+            if self.cdown_move_b > 35: self.cdown_move_b = 70 - self.cdown_move_b
+            if self.cdown_move_b < 0: self.cdown_move_b = 0
+            self.cdown_move_b = self.cdown_move_b * self.direction
+            self.cdown_move_c = (self.count - 15 ) * 5
+            if self.cdown_move_c > 35: self.cdown_move_c = 70 - self.cdown_move_c
+            if self.cdown_move_c < 0: self.cdown_move_c = 0
+            self.cdown_move_c = self.cdown_move_c * self.direction
+            display_image(self.img_s[0], self.small_x+self.cdown_move_a, self.small_y1)
+            display_image(self.img_s[1], self.small_x+self.cdown_move_b, self.small_y2)
+            display_image(self.img_s[2], self.small_x+self.cdown_move_c, self.small_y3)
 
-            if self.is_countdown():
-                self.countdown_count += 1
-                if self.countdown_count >= 45:
-                    self.countdown_count = 0
-                    self.get_result()
+            self.count += 1
+            if self.count >= 31:
+                self.count = 0
+                self.get_result()
 
         elif self.is_show():
             display_image(self.img_l[self.sign], self.large_x, self.large_y)
+#            print(f'{self.side=}showshowshow')
 
         elif self.is_even():
             display_image(self.img_l[self.sign], self.large_x+self.even_shift[self.even_count], self.large_y)
             self.even_count += 1
+#            print(f'{self.side=},{self.even_count=}eveneven')
             if self.even_count > 20:
                 self.even_count = 0
                 self.get_result()
@@ -196,15 +202,45 @@ class Hand:
         elif self.is_win():
             display_image(self.img_l[self.sign], self.large_x+self.win_shift[self.win_count], self.large_y)
             self.win_count += 1
+#            print(f'{self.side=},{self.win_count=}winwin')
             if self.win_count > 20:
                 self.win_count = 0
                 self.get_result()
 
         elif self.is_lose():
             display_image(self.img_l[self.sign], self.large_x+self.lose_shift[self.lose_count], self.large_y)
+#            print(f'{self.side=},{self.lose_count=}loselose')
             self.lose_count += 1
             if self.lose_count > 20:
                 self.lose_count = 0
+                self.get_result()
+
+        elif self.status == 'win-sword':
+            display_image(self.sword_l, self.large_x+(self.count * self.wepon_move), self.large_y)
+            self.count += 1
+            if self.count > 10:
+                self.count = 0
+                self.get_result()
+
+        elif self.status == 'win-sheld':
+            display_image(self.sheld_l, self.large_x+(self.count * self.wepon_move), self.large_y)
+            self.count += 1
+            if self.count > 10:
+                self.count = 0
+                self.get_result()
+
+        elif self.status == 'lose-sword':
+            display_image(self.sword_l, self.large_x+(self.count * self.wepon_move), self.large_y)
+            self.count += 1
+            if self.count > 10:
+                self.count = 0
+                self.get_result()
+
+        elif self.status == 'lose-sheld':
+            display_image(self.sheld_l, self.large_x+(self.count * self.wepon_move), self.large_y)
+            self.count += 1
+            if self.count > 10:
+                self.count = 0
                 self.get_result()
 
     def get_result(self):
@@ -246,17 +282,38 @@ show_icon()
 left_hand = Hand('left')
 right_hand = Hand('right')
 
+
+def button_a_handler(p):
+    left_hand.push_button2()
+
+
+def button_b_handler(p):
+    left_hand.push_button1()
+
+
+def button_x_handler(p):
+    right_hand.push_button1()
+
+
+def button_y_handler(p):
+    right_hand.push_button2()
+
+
+button_a = Pin(12, Pin.IN, Pin.PULL_UP)
+button_a.irq(trigger=Pin.IRQ_RISING | Pin.IRQ_FALLING, handler=button_a_handler)
+
+button_b = Pin(13, Pin.IN, Pin.PULL_UP)
+button_b.irq(trigger=Pin.IRQ_RISING | Pin.IRQ_FALLING, handler=button_b_handler)
+
+button_x = Pin(14, Pin.IN, Pin.PULL_UP)
+button_x.irq(trigger=Pin.IRQ_RISING | Pin.IRQ_FALLING, handler=button_x_handler)
+
+button_y = Pin(15, Pin.IN, Pin.PULL_UP)
+button_y.irq(trigger=Pin.IRQ_RISING | Pin.IRQ_FALLING, handler=button_y_handler)
+
+
 while True:
     display.rectangle(30, 0, 180, 135)
-    if button_a.read():
-        left_hand.push_button2()
-    elif button_b.read():
-        left_hand.push_button1()
-
-    if button_x.read():
-        right_hand.push_button1()
-    elif button_y.read():
-        right_hand.push_button2()
 
     if left_hand.is_ready() and right_hand.is_ready():
         left_hand.countdown()
