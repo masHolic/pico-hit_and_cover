@@ -23,9 +23,6 @@ class Hand:
             self.large_x = 40
             self.large_y = 32
             self.img_l = ['img/gu_l_l.jpg', 'img/ti_l_l.jpg', 'img/pa_l_l.jpg']
-            self.line_a = [0, 2, 4, 2]
-            self.line_b = [2, 4, 2, 0]
-            self.line_c = [4, 2, 0, 2]
             self.even_shift = [0, 2, 4, 6, 8, 10, 8, 6, 4, 2, 0, 2, 4, 6, 8, 10, 8, 6, 4, 2, 0]
             self.win_shift = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40]
             self.lose_shift = [0, 0, 0, 0, 0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -10, -10, -10, -10, -10, -10]
@@ -42,9 +39,6 @@ class Hand:
             self.large_x = 130
             self.large_y = 32
             self.img_l = ['img/gu_r_l.jpg', 'img/ti_r_l.jpg', 'img/pa_r_l.jpg']
-            self.line_a = [-0, -2, -4, -2]
-            self.line_b = [-2, -4, -2, -0]
-            self.line_c = [-4, -2, -0, -2]
             self.even_shift = [-0, -2, -4, -6, -8, -10, -8, -6, -4, -2, -0, -2, -4, -6, -8, -10, -8, -6, -4, -2, -0]
             self.win_shift = [-0, -2, -4, -6, -8, -10, -12, -14, -16, -18, -20, -22, -24, -26, -28, -30, -32, -34, -36, -38, -40]
             self.lose_shift = [0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 10, 10, 10]
@@ -52,9 +46,6 @@ class Hand:
             self.sheld_l = 'img/sheld_r_l.jpg'
             self.wepon_move = -4
         self.status = 'wait'
-        self.line_a = [0, 2, 4, 2]
-        self.line_b = [2, 4, 2, 0]
-        self.line_c = [4, 2, 0, 2]
         self.ready_count = 0
         self.countdown_count = 0
         self.count = 0
@@ -149,32 +140,29 @@ class Hand:
         self.lose_count = 0
 
     def update(self):
-        # print(f'side:[{self.side}, {self.status}]')
         if self.is_ready():
-            # self.ready_move = self.count * 2
-            # if self.ready_move == 6: self.ready_move -= 4
-            display_image(self.img_s[0], self.small_x+self.line_a[self.count], self.small_y1)
-            display_image(self.img_s[1], self.small_x+self.line_b[self.count], self.small_y2)
-            display_image(self.img_s[2], self.small_x+self.line_c[self.count], self.small_y3)
-            # display_image(self.img_s[0], self.small_x+self.line_a[self.count], self.small_y1)
-            # display_image(self.img_s[1], self.small_x+self.line_b[self.count], self.small_y2)
-            # display_image(self.img_s[2], self.small_x+self.line_c[self.count], self.small_y3)
+            self.rdy_move_a = (self.count + 2) % 4
+            if self.rdy_move_a >= 3: self.rdy_move_a -= 2
+            self.rdy_move_b = (self.count + 1) % 4
+            if self.rdy_move_b >= 3: self.rdy_move_b -= 2
+            self.rdy_move_c = self.count % 4
+            if self.rdy_move_c >= 3: self.rdy_move_c -= 2
+            display_image(self.img_s[0], self.small_x+self.rdy_move_a, self.small_y1)
+            display_image(self.img_s[1], self.small_x+self.rdy_move_b, self.small_y2)
+            display_image(self.img_s[2], self.small_x+self.rdy_move_c, self.small_y3)
 
-            if self.count >= 3:
-                self.count = 0
-            else:
-                self.count += 1
+            self.count += 1
 
         elif self.is_countdown():
             self.cdown_move_a = self.count * 5
             if self.cdown_move_a > 35: self.cdown_move_a = 70 - self.cdown_move_a
             if self.cdown_move_a < 0: self.cdown_move_a = 0
             self.cdown_move_a = self.cdown_move_a * self.direction
-            self.cdown_move_b = (self.count - 7 ) * 5
+            self.cdown_move_b = (self.count - 7) * 5
             if self.cdown_move_b > 35: self.cdown_move_b = 70 - self.cdown_move_b
             if self.cdown_move_b < 0: self.cdown_move_b = 0
             self.cdown_move_b = self.cdown_move_b * self.direction
-            self.cdown_move_c = (self.count - 15 ) * 5
+            self.cdown_move_c = (self.count - 15) * 5
             if self.cdown_move_c > 35: self.cdown_move_c = 70 - self.cdown_move_c
             if self.cdown_move_c < 0: self.cdown_move_c = 0
             self.cdown_move_c = self.cdown_move_c * self.direction
