@@ -10,6 +10,7 @@ display.set_backlight(1.0)
 
 WIDTH, HEIGHT = display.get_bounds()
 
+
 class Hand:
     def __init__(self, side: str):
         self.side = side
@@ -23,12 +24,9 @@ class Hand:
             self.large_x = 40
             self.large_y = 32
             self.img_l = ['img/gu_l_l.jpg', 'img/ti_l_l.jpg', 'img/pa_l_l.jpg']
-            self.even_shift = [0, 2, 4, 6, 8, 10, 8, 6, 4, 2, 0, 2, 4, 6, 8, 10, 8, 6, 4, 2, 0]
-            self.win_shift = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40]
-            self.lose_shift = [0, 0, 0, 0, 0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -10, -10, -10, -10, -10, -10]
             self.sword_l = 'img/sword_l_l.jpg'
             self.sheld_l = 'img/sheld_l_l.jpg'
-            self.wepon_move = 4
+            # self.wepon_move = 4
         elif self.side == 'right':
             self.direction = -1
             self.small_x = 170
@@ -39,34 +37,37 @@ class Hand:
             self.large_x = 130
             self.large_y = 32
             self.img_l = ['img/gu_r_l.jpg', 'img/ti_r_l.jpg', 'img/pa_r_l.jpg']
-            self.even_shift = [-0, -2, -4, -6, -8, -10, -8, -6, -4, -2, -0, -2, -4, -6, -8, -10, -8, -6, -4, -2, -0]
-            self.win_shift = [-0, -2, -4, -6, -8, -10, -12, -14, -16, -18, -20, -22, -24, -26, -28, -30, -32, -34, -36, -38, -40]
-            self.lose_shift = [0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 10, 10, 10]
             self.sword_l = 'img/sword_r_l.jpg'
             self.sheld_l = 'img/sheld_r_l.jpg'
-            self.wepon_move = -4
+            # self.wepon_move = -4
         self.status = 'wait'
-        self.ready_count = 0
-        self.countdown_count = 0
         self.count = 0
         print(f'side:[{self.side}, {self.status}]')
 
     def push_button1(self):
         if self.is_wait():
             self.ready()
+        elif self.is_ready():
+            self.wait()
         elif self.is_win():
             self.status = 'win-sword'
+            self.count = 0
         elif self.is_lose():
             self.status = 'lose-sword'
+            self.count = 0
         print(f'side:[{self.side}, {self.status}]')
 
     def push_button2(self):
         if self.is_wait():
             self.ready()
+        elif self.is_ready():
+            self.wait()
         elif self.is_win():
             self.status = 'win-sheld'
+            self.count = 0
         elif self.is_lose():
             self.status = 'lose-sheld'
+            self.count = 0
         print(f'side:[{self.side}, {self.status}]')
 
     def is_wait(self):
@@ -111,42 +112,48 @@ class Hand:
         else:
             return False
 
+    def wait(self):
+        self.count = 0
+        self.status = 'wait'
+        print(f'side:[{self.side}, {self.status}]')
+
     def ready(self):
-        if self.is_wait():
-            self.count = 0
-            self.status = 'ready'
-            print(f'side:[{self.side}, {self.status}]')
+        self.count = 0
+        self.status = 'ready'
+        print(f'side:[{self.side}, {self.status}]')
 
     def countdown(self):
         if self.status == 'ready':
-            self.status = 'countdown'
-            self.countdown_count = 0
             self.count = 0
+            self.status = 'countdown'
         print(f'side:[{self.side}, {self.status}]')
 
     def even(self):
         self.status = 'even'
         print(f'side:[{self.side}, {self.status}]')
-        self.even_count = 0
+        self.count = 0
 
     def win(self):
         self.status = 'win'
         print(f'side:[{self.side}, {self.status}]')
-        self.win_count = 0
+        self.count = 0
 
     def lose(self):
         self.status = 'lose'
         print(f'side:[{self.side}, {self.status}]')
-        self.lose_count = 0
+        self.count = 0
 
     def update(self):
         if self.is_ready():
             self.rdy_move_a = (self.count + 2) % 4
-            if self.rdy_move_a >= 3: self.rdy_move_a -= 2
+            if self.rdy_move_a >= 3:
+                self.rdy_move_a -= 2
             self.rdy_move_b = (self.count + 1) % 4
-            if self.rdy_move_b >= 3: self.rdy_move_b -= 2
+            if self.rdy_move_b >= 3:
+                self.rdy_move_b -= 2
             self.rdy_move_c = self.count % 4
-            if self.rdy_move_c >= 3: self.rdy_move_c -= 2
+            if self.rdy_move_c >= 3:
+                self.rdy_move_c -= 2
             display_image(self.img_s[0], self.small_x+self.rdy_move_a, self.small_y1)
             display_image(self.img_s[1], self.small_x+self.rdy_move_b, self.small_y2)
             display_image(self.img_s[2], self.small_x+self.rdy_move_c, self.small_y3)
@@ -155,16 +162,22 @@ class Hand:
 
         elif self.is_countdown():
             self.cdown_move_a = self.count * 5
-            if self.cdown_move_a > 35: self.cdown_move_a = 70 - self.cdown_move_a
-            if self.cdown_move_a < 0: self.cdown_move_a = 0
+            if self.cdown_move_a > 35:
+                self.cdown_move_a = 70 - self.cdown_move_a
+            if self.cdown_move_a < 0:
+                self.cdown_move_a = 0
             self.cdown_move_a = self.cdown_move_a * self.direction
             self.cdown_move_b = (self.count - 7) * 5
-            if self.cdown_move_b > 35: self.cdown_move_b = 70 - self.cdown_move_b
-            if self.cdown_move_b < 0: self.cdown_move_b = 0
+            if self.cdown_move_b > 35:
+                self.cdown_move_b = 70 - self.cdown_move_b
+            if self.cdown_move_b < 0:
+                self.cdown_move_b = 0
             self.cdown_move_b = self.cdown_move_b * self.direction
             self.cdown_move_c = (self.count - 15) * 5
-            if self.cdown_move_c > 35: self.cdown_move_c = 70 - self.cdown_move_c
-            if self.cdown_move_c < 0: self.cdown_move_c = 0
+            if self.cdown_move_c > 35:
+                self.cdown_move_c = 70 - self.cdown_move_c
+            if self.cdown_move_c < 0:
+                self.cdown_move_c = 0
             self.cdown_move_c = self.cdown_move_c * self.direction
             display_image(self.img_s[0], self.small_x+self.cdown_move_a, self.small_y1)
             display_image(self.img_s[1], self.small_x+self.cdown_move_b, self.small_y2)
@@ -177,55 +190,65 @@ class Hand:
 
         elif self.is_show():
             display_image(self.img_l[self.sign], self.large_x, self.large_y)
-#            print(f'{self.side=}showshowshow')
 
         elif self.is_even():
-            display_image(self.img_l[self.sign], self.large_x+self.even_shift[self.even_count], self.large_y)
-            self.even_count += 1
-#            print(f'{self.side=},{self.even_count=}eveneven')
-            if self.even_count > 20:
-                self.even_count = 0
+            self.move = self.count * 2
+            while self.move > 10:
+                self.move = abs(self.move - 20)
+            self.move = self.move * self.direction
+            display_image(self.img_l[self.sign], self.large_x+self.move, self.large_y)
+            self.count += 1
+            if self.count > 20:
+                self.count = 0
                 self.get_result()
 
         elif self.is_win():
-            display_image(self.img_l[self.sign], self.large_x+self.win_shift[self.win_count], self.large_y)
-            self.win_count += 1
-#            print(f'{self.side=},{self.win_count=}winwin')
-            if self.win_count > 20:
-                self.win_count = 0
+            self.move = self.count * 2 * self.direction
+            display_image(self.img_l[self.sign], self.large_x+self.move, self.large_y)
+            self.count += 1
+            if self.count > 20:
+                self.count = 0
                 self.get_result()
 
         elif self.is_lose():
-            display_image(self.img_l[self.sign], self.large_x+self.lose_shift[self.lose_count], self.large_y)
-#            print(f'{self.side=},{self.lose_count=}loselose')
-            self.lose_count += 1
-            if self.lose_count > 20:
-                self.lose_count = 0
+            self.move = -min(max(self.count - 5, 0), 10) * self.direction
+            display_image(self.img_l[self.sign], self.large_x+self.move, self.large_y)
+            self.count += 1
+            if self.count > 20:
+                self.count = 0
                 self.get_result()
 
         elif self.status == 'win-sword':
-            display_image(self.sword_l, self.large_x+(self.count * self.wepon_move), self.large_y)
+            self.move = self.count * 4 * self.direction
+            # display_image(self.sword_l, self.large_x+(self.count * self.wepon_move), self.large_y)
+            display_image(self.sword_l, self.large_x+self.move, self.large_y)
             self.count += 1
             if self.count > 10:
                 self.count = 0
                 self.get_result()
 
         elif self.status == 'win-sheld':
-            display_image(self.sheld_l, self.large_x+(self.count * self.wepon_move), self.large_y)
+            self.move = self.count * 4 * self.direction
+            #display_image(self.sheld_l, self.large_x+(self.count * self.wepon_move), self.large_y)
+            display_image(self.sheld_l, self.large_x+self.move, self.large_y)
             self.count += 1
             if self.count > 10:
                 self.count = 0
                 self.get_result()
 
         elif self.status == 'lose-sword':
-            display_image(self.sword_l, self.large_x+(self.count * self.wepon_move), self.large_y)
+            self.move = self.count * 4 * self.direction
+            # display_image(self.sword_l, self.large_x+(self.count * self.wepon_move), self.large_y)
+            display_image(self.sword_l, self.large_x+self.move, self.large_y)
             self.count += 1
             if self.count > 10:
                 self.count = 0
                 self.get_result()
 
         elif self.status == 'lose-sheld':
-            display_image(self.sheld_l, self.large_x+(self.count * self.wepon_move), self.large_y)
+            self.move = self.count * 4 * self.direction
+            #display_image(self.sheld_l, self.large_x+(self.count * self.wepon_move), self.large_y)
+            display_image(self.sheld_l, self.large_x+self.move, self.large_y)
             self.count += 1
             if self.count > 10:
                 self.count = 0
