@@ -26,7 +26,6 @@ class Hand:
             self.img_l = ['img/gu_l_l.jpg', 'img/ti_l_l.jpg', 'img/pa_l_l.jpg']
             self.sword_l = 'img/sword_l_l.jpg'
             self.sheld_l = 'img/sheld_l_l.jpg'
-            # self.wepon_move = 4
         elif self.side == 'right':
             self.direction = -1
             self.small_x = 170
@@ -39,7 +38,6 @@ class Hand:
             self.img_l = ['img/gu_r_l.jpg', 'img/ti_r_l.jpg', 'img/pa_r_l.jpg']
             self.sword_l = 'img/sword_r_l.jpg'
             self.sheld_l = 'img/sheld_r_l.jpg'
-            # self.wepon_move = -4
         self.status = 'wait'
         self.count = 0
         print(f'side:[{self.side}, {self.status}]')
@@ -47,20 +45,28 @@ class Hand:
     def push_button1(self):
         if self.is_wait():
             self.ready()
-        elif self.is_ready():
-            self.wait()
         elif self.is_win():
             self.status = 'win-sword'
             self.count = 0
+            self.check_wepon_win()
         elif self.is_lose():
             self.status = 'lose-sword'
             self.count = 0
         print(f'side:[{self.side}, {self.status}]')
 
+    def check_wepon_win(self):
+        if self.side == 'left':
+            right_hand.status == "lose"
+            self.status = 'win-sword-win'
+            right_hand.status = 'lose-confirm'
+        elif self.side == 'right':
+            left_hand.status == "lose"
+            self.status = 'win-sword-win'
+            left_hand.status = 'lose-confirm'
+        print(f'side:[{self.side}, {self.status}]')
+
     def push_button2(self):
-        if self.is_wait():
-            self.ready()
-        elif self.is_ready():
+        if self.is_ready():
             self.wait()
         elif self.is_win():
             self.status = 'win-sheld'
@@ -145,19 +151,18 @@ class Hand:
 
     def update(self):
         if self.is_ready():
-            self.rdy_move_a = (self.count + 2) % 4
-            if self.rdy_move_a >= 3:
-                self.rdy_move_a -= 2
-            self.rdy_move_b = (self.count + 1) % 4
-            if self.rdy_move_b >= 3:
-                self.rdy_move_b -= 2
-            self.rdy_move_c = self.count % 4
-            if self.rdy_move_c >= 3:
-                self.rdy_move_c -= 2
-            display_image(self.img_s[0], self.small_x+self.rdy_move_a, self.small_y1)
-            display_image(self.img_s[1], self.small_x+self.rdy_move_b, self.small_y2)
-            display_image(self.img_s[2], self.small_x+self.rdy_move_c, self.small_y3)
-
+            self.move_a = (self.count + 2) % 4 - 1
+            if self.move_a >= 2:
+                self.move_a -= 2
+            self.move_b = (self.count + 1) % 4 - 1
+            if self.move_b >= 2:
+                self.move_b -= 2
+            self.move_c = self.count % 4 - 1
+            if self.move_c >= 2:
+                self.move_c -= 2
+            display_image(self.img_s[0], self.small_x+self.move_a, self.small_y1)
+            display_image(self.img_s[1], self.small_x+self.move_b, self.small_y2)
+            display_image(self.img_s[2], self.small_x+self.move_c, self.small_y3)
             self.count += 1
 
         elif self.is_countdown():
@@ -220,7 +225,6 @@ class Hand:
 
         elif self.status == 'win-sword':
             self.move = self.count * 4 * self.direction
-            # display_image(self.sword_l, self.large_x+(self.count * self.wepon_move), self.large_y)
             display_image(self.sword_l, self.large_x+self.move, self.large_y)
             self.count += 1
             if self.count > 10:
@@ -229,7 +233,6 @@ class Hand:
 
         elif self.status == 'win-sheld':
             self.move = self.count * 4 * self.direction
-            # display_image(self.sheld_l, self.large_x+(self.count * self.wepon_move), self.large_y)
             display_image(self.sheld_l, self.large_x+self.move, self.large_y)
             self.count += 1
             if self.count > 10:
@@ -238,7 +241,6 @@ class Hand:
 
         elif self.status == 'lose-sword':
             self.move = self.count * 4 * self.direction
-            # display_image(self.sword_l, self.large_x+(self.count * self.wepon_move), self.large_y)
             display_image(self.sword_l, self.large_x+self.move, self.large_y)
             self.count += 1
             if self.count > 10:
@@ -247,12 +249,18 @@ class Hand:
 
         elif self.status == 'lose-sheld':
             self.move = self.count * 4 * self.direction
-            # display_image(self.sheld_l, self.large_x+(self.count * self.wepon_move), self.large_y)
             display_image(self.sheld_l, self.large_x+self.move, self.large_y)
             self.count += 1
             if self.count > 10:
                 self.count = 0
                 self.get_result()
+
+        elif self.status == 'win-sword-win':
+            self.move = self.count * 8 * self.direction
+            display_image(self.sword_l, self.large_x+self.move, self.large_y)
+            self.count += 1
+            if self.count > 10:
+                self.count = 0
 
     def get_result(self):
         self.hand_dic = ['gu', 'ti', 'pa']
