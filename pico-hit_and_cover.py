@@ -229,7 +229,7 @@ class Hand:
 
         elif self.status == 'win-sheld':
             self.move = self.count * 4 * self.direction
-            #display_image(self.sheld_l, self.large_x+(self.count * self.wepon_move), self.large_y)
+            # display_image(self.sheld_l, self.large_x+(self.count * self.wepon_move), self.large_y)
             display_image(self.sheld_l, self.large_x+self.move, self.large_y)
             self.count += 1
             if self.count > 10:
@@ -247,7 +247,7 @@ class Hand:
 
         elif self.status == 'lose-sheld':
             self.move = self.count * 4 * self.direction
-            #display_image(self.sheld_l, self.large_x+(self.count * self.wepon_move), self.large_y)
+            # display_image(self.sheld_l, self.large_x+(self.count * self.wepon_move), self.large_y)
             display_image(self.sheld_l, self.large_x+self.move, self.large_y)
             self.count += 1
             if self.count > 10:
@@ -311,16 +311,16 @@ def button_y_handler(p):
 
 
 button_a = Pin(12, Pin.IN, Pin.PULL_UP)
-button_a.irq(trigger=Pin.IRQ_RISING | Pin.IRQ_FALLING, handler=button_a_handler)
+button_a.irq(trigger=Pin.IRQ_FALLING, handler=button_a_handler)
 
 button_b = Pin(13, Pin.IN, Pin.PULL_UP)
-button_b.irq(trigger=Pin.IRQ_RISING | Pin.IRQ_FALLING, handler=button_b_handler)
+button_b.irq(trigger=Pin.IRQ_FALLING, handler=button_b_handler)
 
 button_x = Pin(14, Pin.IN, Pin.PULL_UP)
-button_x.irq(trigger=Pin.IRQ_RISING | Pin.IRQ_FALLING, handler=button_x_handler)
+button_x.irq(trigger=Pin.IRQ_FALLING, handler=button_x_handler)
 
 button_y = Pin(15, Pin.IN, Pin.PULL_UP)
-button_y.irq(trigger=Pin.IRQ_RISING | Pin.IRQ_FALLING, handler=button_y_handler)
+button_y.irq(trigger=Pin.IRQ_FALLING, handler=button_y_handler)
 
 
 while True:
